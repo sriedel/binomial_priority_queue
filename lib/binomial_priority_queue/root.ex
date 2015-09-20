@@ -8,10 +8,10 @@ defmodule BinomialPriorityQueue.Root do
   def add( root, value, score ) when is_number( score ) do
     node = BPQNode.new( value, score )
 
-    add_node( new, Enum.reverse( root ), node )
+    add_node( new, root, node )
   end
 
-  defp add_node( new_root, [], node ), do: [ node | new_root ]
+  defp add_node( new_root, [], node ), do: Enum.reverse( [ node | new_root ] )
   defp add_node( new_root, [ h | t ], node ) do
     cond do
       h.size == node.size -> add_node( new_root, t, BPQNode.merge( node, h ) )
@@ -34,5 +34,13 @@ defmodule BinomialPriorityQueue.Root do
 
   def size( root ) do
     root |> Enum.map( &(&1.size) ) |> Enum.sum
+  end
+
+  def to_list( root ), do: to_list( root, [] )
+
+  defp to_list( [], acc ), do: Enum.reverse( acc )
+  defp to_list( root, acc ) do
+    node = min( root )
+    to_list( pop( root ), [ node | acc ] )
   end
 end

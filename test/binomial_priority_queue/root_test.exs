@@ -54,6 +54,8 @@ defmodule BinomialPriorityQueueRootTest do
 
     assert BPQRoot.size( root ) == 5
     assert %BinomialPriorityQueue.Node{value: "one", score: 1} = BPQRoot.min( root )
+    mapped_scores = BPQRoot.to_list( root ) |> Enum.map( &(&1.score) )
+    assert mapped_scores == [ 1, 2, 3, 4, 5 ]
     
     root = BPQRoot.pop( root )
     assert BPQRoot.size( root ) == 4
