@@ -1,44 +1,53 @@
 defmodule BinomialPriorityQueue.Root do
+  defstruct size: 0, forrest: []
+
   alias BinomialPriorityQueue.Node, as: BPQNode
+  alias BinomialPriorityQueue.Root, as: BPQRoot
 
   def new do
-    []
+    %BPQRoot{}
   end
+  
+  defp new( size, forrest ), do: %BPQRoot{ size: size, forrest: forrest }
 
   def add( root, value, score ) when is_number( score ) do
     node = BPQNode.new( value, score )
 
-    add_node( new, root, node )
+    new_forrest = add_node( [], root.forrest, node ) 
+    new( root.size + 1, new_forrest )
   end
 
-  defp add_node( new_root, [], node ), do: Enum.reverse( [ node | new_root ] )
-  defp add_node( new_root, [ h | t ], node ) do
+  defp add_node( acc, _forrest = [], node ), do: Enum.reverse( [ node | acc ] )
+  defp add_node( acc, _forrest = [ h | t ], node ) do
     cond do
-      h.size == node.size -> add_node( new_root, t, BPQNode.merge( node, h ) )
-      h.size < node.size  -> add_node( [ h | new_root ], t, node )
-      h.size > node.size  -> add_node( [ node | new_root ], t, h )
+      h.size == node.size -> add_node( acc, t, BPQNode.merge( node, h ) )
+      h.size < node.size  -> add_node( [ h | acc ], t, node )
+      h.size > node.size  -> add_node( [ node | acc ], t, h )
     end
   end
 
-  def min( [] ), do: nil
+  def min( _root = %BPQRoot{size: 0} ), do: nil
   def min( root ) do
-    Enum.min_by( root, &(&1.score) )
+    Enum.min_by( root.forrest, &(&1.score) )
   end
 
-  def pop( [] ), do: raise Enum.EmptyError
+  def pop( _root = %BPQRoot{size: 0} ), do: raise Enum.EmptyError
   def pop( root ) do
     min_node = min( root )
-    root_with_tree_removed = List.delete( root, min_node )
-    Enum.reduce( min_node.children, root_with_tree_removed, fn( child, new_root ) -> add_node( new, new_root, child ) end )
+    root_with_tree_removed = List.delete( root.forrest, min_node )
+    new_forrest = Enum.reduce( min_node.children,
+                               root_with_tree_removed, 
+                               fn( child, acc ) -> add_node( [], acc, child ) end )
+    new( root.size - 1, new_forrest )
   end
 
   def size( root ) do
-    root |> Enum.map( &(&1.size) ) |> Enum.sum
+    root.size
   end
 
   def to_list( root ), do: to_list( root, [] )
 
-  defp to_list( [], acc ), do: Enum.reverse( acc )
+  defp to_list( %BPQRoot{ size: 0 }, acc ), do: Enum.reverse( acc )
   defp to_list( root, acc ) do
     node = min( root )
     to_list( pop( root ), [ node | acc ] )
