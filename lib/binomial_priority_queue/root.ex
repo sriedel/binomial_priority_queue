@@ -27,13 +27,19 @@ defmodule BinomialPriorityQueue.Root do
     end
   end
 
+  def min( [] ), do: nil
   def min( root ) do
     Enum.min_by( root, &(&1.score) )
   end
 
+  def pop( [] ), do: raise Enum.EmptyError
   def pop( root ) do
     min_node = min( root )
-    root_with_tree_removed = List.delete( root.forrest, min_node )
+    root_with_tree_removed = List.delete( root, min_node )
     Enum.reduce( min_node.children, root_with_tree_removed, fn( child, new_root ) -> add_node( new, new_root, child ) end )
+  end
+
+  def size( root ) do
+    root |> Enum.map( &(&1.size) ) |> Enum.sum
   end
 end
