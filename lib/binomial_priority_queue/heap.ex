@@ -1,14 +1,14 @@
-defmodule BinomialPriorityQueue.Root do
+defmodule BinomialPriorityQueue.Heap do
   defstruct size: 0, forrest: []
 
   alias BinomialPriorityQueue.Node, as: BPQNode
-  alias BinomialPriorityQueue.Root, as: BPQRoot
+  alias BinomialPriorityQueue.Heap, as: BPQHeap
 
   def new do
-    %BPQRoot{}
+    %BPQHeap{}
   end
   
-  defp new( size, forrest ), do: %BPQRoot{ size: size, forrest: forrest }
+  defp new( size, forrest ), do: %BPQHeap{ size: size, forrest: forrest }
 
   def add( root, value, score ) when is_number( score ) do
     node = BPQNode.new( value, score )
@@ -26,12 +26,12 @@ defmodule BinomialPriorityQueue.Root do
     end
   end
 
-  def min( _root = %BPQRoot{size: 0} ), do: nil
+  def min( _root = %BPQHeap{size: 0} ), do: nil
   def min( root ) do
     Enum.min_by( root.forrest, &(&1.score) )
   end
 
-  def pop( _root = %BPQRoot{size: 0} ), do: raise Enum.EmptyError
+  def pop( _root = %BPQHeap{size: 0} ), do: raise Enum.EmptyError
   def pop( root ) do
     min_node = min( root )
     root_with_tree_removed = List.delete( root.forrest, min_node )
@@ -47,7 +47,7 @@ defmodule BinomialPriorityQueue.Root do
 
   def to_list( root ), do: to_list( root, [] )
 
-  defp to_list( %BPQRoot{ size: 0 }, acc ), do: Enum.reverse( acc )
+  defp to_list( %BPQHeap{ size: 0 }, acc ), do: Enum.reverse( acc )
   defp to_list( root, acc ) do
     node = min( root )
     to_list( pop( root ), [ node | acc ] )

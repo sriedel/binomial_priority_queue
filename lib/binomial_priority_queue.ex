@@ -1,7 +1,7 @@
 defmodule BinomialPriorityQueue do
   use GenServer
 
-  alias BinomialPriorityQueue.Root, as: BPQRoot
+  alias BinomialPriorityQueue.Heap, as: BPQHeap
 
   def start_link( opts \\ [] ) do
     GenServer.start_link( __MODULE__, :ok, opts )
@@ -20,26 +20,26 @@ defmodule BinomialPriorityQueue do
   def stop( server ), do: GenServer.call( server, { :stop } )
 
   def init( :ok ) do
-    { :ok, BPQRoot.new }
+    { :ok, BPQHeap.new }
   end
 
   def handle_call( { :add, value, score }, _from, queue ) do
-    { :reply, :ok, BPQRoot.add( queue, value, score ) }
+    { :reply, :ok, BPQHeap.add( queue, value, score ) }
   end
 
   def handle_call( { :min }, _from, queue ) do
-    { :reply, BPQRoot.min( queue ), queue }
+    { :reply, BPQHeap.min( queue ), queue }
   end
 
   def handle_call( { :pop }, _from, queue ) do
-    case BPQRoot.size( queue ) do
+    case BPQHeap.size( queue ) do
       0 -> { :reply, :empty, queue }
-      _ -> { :reply, :ok, BPQRoot.pop( queue ) }
+      _ -> { :reply, :ok, BPQHeap.pop( queue ) }
     end
   end
 
   def handle_call( { :size }, _from, queue ) do
-    { :reply, BPQRoot.size( queue ), queue }
+    { :reply, BPQHeap.size( queue ), queue }
   end
 
   def handle_call( { :stop }, _from, queue ) do
