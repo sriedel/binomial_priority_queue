@@ -12,13 +12,6 @@ defmodule BinomialPriorityQueue.Root do
   end
 
   defp add_node( new_root, [], node ), do: [ node | new_root ]
-  defp add_node( new_root, [ h ], node ) do
-    cond do
-      h.size == node.size -> add_node( new_root, [], BPQNode.merge( node, h ) )
-      h.size < node.size  -> add_node( [ h | new_root ], [], node )
-      h.size > node.size  -> add_node( [ node | new_root ], [], h )
-    end
-  end
   defp add_node( new_root, [ h | t ], node ) do
     cond do
       h.size == node.size -> add_node( new_root, t, BPQNode.merge( node, h ) )
