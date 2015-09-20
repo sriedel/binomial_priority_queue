@@ -1,39 +1,39 @@
-defmodule Root do
+defmodule BinomialPriorityQueue.Root do
+  alias BinomialPriorityQueue.Node, as: BPQNode
+
   def new do
     []
   end
 
-  def add( root, { value, score } ) when is_number( score ) do
-    unitary_tree = Tree.new( value, score )
+  def add( root, value, score ) when is_number( score ) do
+    node = BPQNode.new( value, score )
 
-    add_tree( new, Enum.reverse( root ), unitary_tree )
+    add_node( new, Enum.reverse( root ), node )
   end
 
-  defp add_tree( new_root, [], tree ), do: [ tree | new_root ]
-  defp add_tree( new_root, [ h ], tree ) do
+  defp add_node( new_root, [], node ), do: [ node | new_root ]
+  defp add_node( new_root, [ h ], node ) do
     cond do
-      Tree.size( h ) == Tree.size( tree ) -> add_tree( new_root, [], Tree.merge( tree, h ) )
-      Tree.size( h ) < Tree.size( tree )  -> add_tree( [ h | new_root ], [], tree )
-      Tree.size( h ) > Tree.size( tree )  -> add_tree( [ tree | new_root ], [], h )
+      h.size == node.size -> add_node( new_root, [], BPQNode.merge( node, h ) )
+      h.size < node.size  -> add_node( [ h | new_root ], [], node )
+      h.size > node.size  -> add_node( [ node | new_root ], [], h )
     end
   end
-  defp add_tree( new_root, [ h | t ], tree ) do
+  defp add_node( new_root, [ h | t ], node ) do
     cond do
-      Tree.size( h ) == Tree.size( tree ) -> add_tree( new_root, t, Tree.merge( tree, h ) )
-      Tree.size( h ) < Tree.size( tree )  -> add_tree( [ h | new_root ], t, tree )
-      Tree.size( h ) > Tree.size( tree )  -> add_tree( [ tree | new_root ], t, h )
+      h.size == node.size -> add_node( new_root, t, BPQNode.merge( node, h ) )
+      h.size < node.size  -> add_node( [ h | new_root ], t, node )
+      h.size > node.size  -> add_node( [ node | new_root ], t, h )
     end
   end
 
   def min( root ) do
-    Enum.min_by( root, fn( tree ) -> { _, score } = Tree.min( tree ) ; score end ) |> Tree.min
+    Enum.min_by( root, &(&1.score) )
   end
 
   def pop( root ) do
-    min_tree = Enum.min_by( root, fn( tree ) -> { _, score } = Tree.min( tree ) ; score end )
-    { value, score, children } = Tree.remove_min( min_tree )
-    root_with_tree_removed = List.delete( root, min_tree )
-    new_root = Enum.reduce( children, root_with_tree_removed, fn( child, new_root ) -> add_tree( new, new_root, child ) end )
-    { new_root, value, score }
+    min_node = min( root )
+    root_with_tree_removed = List.delete( root.forrest, min_node )
+    Enum.reduce( min_node.children, root_with_tree_removed, fn( child, new_root ) -> add_node( new, new_root, child ) end )
   end
 end
