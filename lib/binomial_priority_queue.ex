@@ -32,7 +32,10 @@ defmodule BinomialPriorityQueue do
   end
 
   def handle_call( { :pop }, _from, queue ) do
-    { :reply, :ok, BPQRoot.pop( queue ) }
+    case BPQRoot.size( queue ) do
+      0 -> { :reply, :empty, queue }
+      _ -> { :reply, :ok, BPQRoot.pop( queue ) }
+    end
   end
 
   def handle_call( { :size }, _from, queue ) do
