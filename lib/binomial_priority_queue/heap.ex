@@ -41,9 +41,7 @@ defmodule BinomialPriorityQueue.Heap do
     new( root.size - 1, new_forrest )
   end
 
-  def size( root ) do
-    root.size
-  end
+  def size( root ), do: root.size
 
   def to_list( root ), do: to_list( root, [] )
 
