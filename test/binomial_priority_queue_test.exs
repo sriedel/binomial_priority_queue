@@ -72,4 +72,21 @@ defmodule BinomialPriorityQueueTest do
     assert BPQ.size( server ) == 0
   end
 
+  test "the min_pop operation", %{server: server } do
+    BPQ.add( server, "three", 3 ) 
+    BPQ.add( server, "one", 1 )
+    BPQ.add( server, "five", 5 )
+    BPQ.add( server, "two", 2 )
+    BPQ.add( server, "four", 4 )
+
+    min_node = BPQ.min_pop( server )
+    assert min_node.score == 1
+    assert min_node.value == "one"
+
+    assert BPQ.size( server ) == 4
+    new_min_node = BPQ.min( server )
+    assert new_min_node.score == 2
+    assert new_min_node.value == "two"
+  end
+
 end

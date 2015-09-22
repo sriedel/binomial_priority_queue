@@ -15,6 +15,8 @@ defmodule BinomialPriorityQueue do
 
   def pop( server ), do: GenServer.call( server, { :pop } )
 
+  def min_pop( server ), do: GenServer.call( server, { :min_pop } )
+
   def size( server ), do: GenServer.call( server, { :size } )
 
   def stop( server ), do: GenServer.call( server, { :stop } )
@@ -35,6 +37,13 @@ defmodule BinomialPriorityQueue do
     case BPQHeap.size( queue ) do
       0 -> { :reply, :empty, queue }
       _ -> { :reply, :ok, BPQHeap.pop( queue ) }
+    end
+  end
+
+  def handle_call( { :min_pop }, _from, queue ) do
+    case BPQHeap.size( queue ) do
+      0 -> { :reply, BPQHeap.min( queue ), queue }
+      _ -> { :reply, BPQHeap.min( queue ), BPQHeap.pop( queue ) }
     end
   end
 
